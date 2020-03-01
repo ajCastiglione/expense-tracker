@@ -9,6 +9,8 @@ export const AddTransaction = () => {
 
   const onSubmit = e => {
     e.preventDefault();
+    setText("");
+    setAmount("");
     const newTransaction = {
       id: Math.floor(Math.random() * 100000),
       text,
@@ -18,7 +20,7 @@ export const AddTransaction = () => {
     addTransaction(newTransaction);
   };
   return (
-    <>
+    <React.Fragment>
       <h3>Add new transaction</h3>
       <form id="form" onSubmit={onSubmit}>
         <div className="form-control">
@@ -44,6 +46,6 @@ export const AddTransaction = () => {
         </div>
         <button className="btn">Add transaction</button>
       </form>
-    </>
+    </React.Fragment>
   );
 };
