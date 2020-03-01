@@ -1,3 +1,4 @@
+const path = require('path');
 const express = require("express");
 const dotenv = require("dotenv");
 const colors = require("colors");
@@ -19,6 +20,9 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use("/api/v1/transactions", transactions);
+
+// Must be below API routes
+if()
 
 const PORT = process.env.PORT || 5000;
 
