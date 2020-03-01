@@ -1,6 +1,6 @@
 export default (state, action) => {
   switch (action.type) {
-    case "GET_TRANSACTION":
+    case "GET_TRANSACTIONS":
       return {
         ...state,
         loading: false,
