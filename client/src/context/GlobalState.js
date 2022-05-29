@@ -6,7 +6,7 @@ import axios from "axios";
 const initialState = {
   transactions: [],
   error: null,
-  loading: true
+  loading: true,
 };
 
 // Create context
@@ -23,12 +23,12 @@ export const GlobalProvider = ({ children }) => {
 
       dispatch({
         type: "GET_TRANSACTIONS",
-        payload: res.data.data
+        payload: res.data.data,
       });
     } catch (err) {
       dispatch({
         type: "TRANSACTION_ERROR",
-        payload: err.response.data.error
+        payload: err.response.data.error,
       });
     }
   }
@@ -38,12 +38,12 @@ export const GlobalProvider = ({ children }) => {
       await axios.delete(`/api/v1/transactions/${id}`);
       dispatch({
         type: "DELETE_TRANSACTION",
-        payload: id
+        payload: id,
       });
     } catch (err) {
       dispatch({
         type: "TRANSACTION_ERROR",
-        payload: err.response.data.error
+        payload: err.response.data.error,
       });
     }
   }
@@ -51,20 +51,20 @@ export const GlobalProvider = ({ children }) => {
   async function addTransaction(transaction) {
     const config = {
       headers: {
-        "Content-Type": "application/json"
-      }
+        "Content-Type": "application/json",
+      },
     };
 
     try {
       const res = await axios.post("/api/v1/transactions", transaction, config);
       dispatch({
         type: "ADD_TRANSACTION",
-        payload: res.data.data
+        payload: res.data.data,
       });
     } catch (err) {
       dispatch({
         type: "TRANSACTION_ERROR",
-        payload: err.response.data.error
+        payload: err.response.data.error,
       });
     }
   }
@@ -77,8 +77,9 @@ export const GlobalProvider = ({ children }) => {
         error: state.error,
         loading: state.loading,
         deleteTransaction,
-        addTransaction
-      }}>
+        addTransaction,
+      }}
+    >
       {children}
     </GlobalContext.Provider>
   );
