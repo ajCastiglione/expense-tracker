@@ -5,17 +5,18 @@ const Transaction = require("../models/Transaction");
 // @access  Public
 exports.getTransactions = async (req, res, next) => {
   try {
-    const transactions = await Transaction.find();
+    const transactions = await Transaction.findAll();
 
     return res.status(200).send({
       success: true,
       count: transactions.length,
-      data: transactions
+      data: transactions,
     });
   } catch (err) {
+    console.log(err);
     return res.status(500).json({
       success: false,
-      error: "Server Error"
+      error: "Server Error",
     });
   }
 };
@@ -31,19 +32,19 @@ exports.addTransaction = async (req, res, next) => {
 
     return res.status(201).send({
       success: true,
-      data: transaction
+      data: transaction,
     });
   } catch (err) {
     if (err.name === "ValidationError") {
-      const messages = Object.values(err.errors).map(val => val.message);
+      const messages = Object.values(err.errors).map((val) => val.message);
       return res.status(400).send({
         success: false,
-        error: messages
+        error: messages,
       });
     } else {
       return res.status(500).send({
         success: false,
-        error: "Server Error"
+        error: "Server Error",
       });
     }
   }
@@ -59,7 +60,7 @@ exports.deleteTransactions = async (req, res, next) => {
     if (!transaction) {
       return res.status(404).send({
         success: false,
-        error: "No transaction found"
+        error: "No transaction found",
       });
     }
 
@@ -67,12 +68,12 @@ exports.deleteTransactions = async (req, res, next) => {
 
     return res.status(200).send({
       success: true,
-      data: {}
+      data: {},
     });
   } catch (err) {
     return res.status(500).send({
       success: false,
-      error: "Server Error"
+      error: "Server Error",
     });
   }
 };

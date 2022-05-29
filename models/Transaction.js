@@ -1,21 +1,29 @@
-const mongoose = require("mongoose");
-const { Sequelize, Model, DataTypes } = require("sequelize");
-const sequelize = new Sequelize("sqlite::memory:");
+const { DataTypes } = require("sequelize");
+const sequelize = require("../config/db");
 
-const TransactionSchema = sequelize.define("Transaction", {
-  text: {
-    type: DataTypes.STRING,
-    trim: true,
-    allowNull: false,
+const Transaction = sequelize.define(
+  "Transaction",
+  {
+    text: {
+      type: DataTypes.STRING,
+      trim: true,
+      allowNull: false,
+      primaryKey: true,
+    },
+    amount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
   },
-  amount: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-  },
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
+  {
+    timestamps: false,
+  }
+);
 
-console.log(TransactionSchema === sequelize.models.Transaction);
+console.log(Transaction === sequelize.models.Transaction);
+
+module.exports = Transaction;

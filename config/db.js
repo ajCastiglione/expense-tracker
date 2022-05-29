@@ -1,32 +1,18 @@
-const dotenv = require("dotenv");
 const { Sequelize } = require("sequelize");
-dotenv.config({ path: "./config/config.env" });
+const dbSchema = require("./databaseSchema");
 
-
-const sequelize = new Sequelize(
-  process.env.MYSQL_DATABASE,
-  process.env.MYSQL_USER,
-  process.env.MYSQL_PASSWORD,
-  {
-    host: process.env.MYSQL_HOST,
-    port: process.env.MYSQL_PORT,
-    dialect: "mysql",
-    pool: {
-      max: 5,
-      min: 0,
-      acquire: 300000,
-      idle: 1000000,
-    },
-  }
-);
+const db = new Sequelize(dbSchema.db, dbSchema.user, dbSchema.password, {
+  ...dbSchema.opts,
+});
 
 async function connectDB() {
   try {
-    await sequelize.authenticate();
+    await db.authenticate();
     console.log("Connection has been established successfully.");
   } catch (error) {
     console.log(error);
   }
 }
+connectDB();
 
-module.exports = connectDB;
+module.exports = db;
