@@ -28,7 +28,11 @@ exports.addTransaction = async (req, res, next) => {
   try {
     const { text, amount } = req.body;
 
-    const transaction = await Transaction.create(req.body);
+    const transaction = await Transaction.create({
+      text,
+      amount,
+      createdAt: new Date(),
+    });
 
     return res.status(201).send({
       success: true,
@@ -55,7 +59,7 @@ exports.addTransaction = async (req, res, next) => {
 // @access  Public
 exports.deleteTransactions = async (req, res, next) => {
   try {
-    const transaction = await Transaction.findById(req.params.id);
+    const transaction = await Transaction.findByPk(req.params.id);
 
     if (!transaction) {
       return res.status(404).send({
@@ -64,7 +68,7 @@ exports.deleteTransactions = async (req, res, next) => {
       });
     }
 
-    await transaction.remove();
+    await transaction.destroy();
 
     return res.status(200).send({
       success: true,
