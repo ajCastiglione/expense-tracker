@@ -47,6 +47,7 @@ services:
       - '3000:3000'
     environment:
         <<: *common-variables
+        CHOKIDAR_USEPOLLING: true
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
