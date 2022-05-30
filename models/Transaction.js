@@ -29,6 +29,4 @@ const Transaction = sequelize.define(
   }
 );
 
-console.log(Transaction === sequelize.models.Transaction);
-
 module.exports = Transaction;

@@ -1,130 +1,60 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
+const { DataTypes } = require("sequelize");
+const dotenv = require("dotenv");
+const sequelize = require("../config/db");
+dotenv.config({ path: "../config/config.env" });
+const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const _ = require("lodash");
-const bcrypt = require("bcryptjs");
 
-let UserSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: true,
-    trim: true,
-    minlength: 1,
-    unique: true,
-    validate: {
-      validator: validator.isEmail,
-      message: "Incorrect email address format"
-    }
+const User = sequelize.define(
+  "User",
+  {
+    id: {
+      type: DataTypes.INTEGER,
+      primaryKey: true,
+    },
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
   },
-  password: {
-    type: String,
-    required: true,
-    minlength: 6
-  },
-  credentials: [
-    {
-      access: {
-        type: String,
-        required: true
+  {
+    hooks: {
+      beforeCreate: async (user) => {
+        const salt = bcrypt.genSaltSync(10, "a");
+        user.password = bcrypt.hashSync(user.password, salt);
       },
-      token: {
-        type: String,
-        required: true
-      }
-    }
-  ]
-});
-
-// Attached to the schema
-UserSchema.methods.generateAuthToken = function() {
-  let user = this;
-  let access = "auth";
-  let token = jwt
-    .sign({ _id: user._id.toHexString(), access }, process.env.JWT_SECRET)
-    .toString();
-
-  user.credentials = user.credentials.concat([{ access, token }]);
-
-  return user.save().then(() => {
-    return token;
-  });
-};
-
-// Attached to the schema
-UserSchema.methods.removeCredentials = function(token) {
-  let user = this;
-  return user.updateOne({
-    $pull: {
-      credentials: { token }
-    }
-  });
-};
-
-// Attached to the Model
-UserSchema.statics.findByToken = function(token) {
-  let User = this;
-  let decoded;
-  try {
-    decoded = jwt.verify(token, process.env.JWT_SECRET);
-  } catch (e) {
-    return Promise.reject();
+      beforeUpdate: async (user) => {
+        const salt = bcrypt.genSaltSync(10, process.env.PASSWORD_HASH_KEY);
+        user.password = bcrypt.hashSync(user.password, salt);
+      },
+    },
+    instanceMethods: {
+      validPassword: (password) => {
+        return bcrypt.compareSync(password, this.password);
+      },
+    },
+    timestamps: false,
   }
+);
 
-  return User.findOne({
-    _id: decoded._id,
-    "credentials.token": token,
-    "credentials.access": "auth"
-  });
+User.prototype.validPassword = async (password, hash) => {
+  return await bcrypt.compare(password, hash);
 };
 
-// Attached to model - finds and authenticates existing user
-UserSchema.statics.findByCredentials = function(email, password) {
-  let User = this;
-
-  return User.findOne({ email }).then(user => {
-    if (!user) {
-      return Promise.reject("User does not exist");
-    }
-    return new Promise((resolve, reject) => {
-      bcrypt.compare(password, user.password, (err, res) => {
-        if (res) {
-          resolve(user);
-        } else {
-          reject("Authentication failed!");
-        }
-      });
-    });
+User.prototype.generateAuthToken = async (id) => {
+  const token = await jwt.sign({ id }, process.env.JWT_KEY, {
+    expiresIn: "7d",
   });
+  console.log(token);
+  return token;
 };
 
-// Attached to model - removes user based on email
-UserSchema.statics.deleteUser = function(email) {
-  let User = this;
-
-  return User.findOneAndRemove({ email }).then(doc => {
-    return new Promise((resolve, reject) => {
-      return resolve(doc);
-    });
-  });
-};
-
-// Encrypting password before saving to database - attached to schema user
-UserSchema.pre("save", function(next) {
-  let user = this;
-
-  if (user.isModified("password")) {
-    // Encrypt passowrd
-    bcrypt.genSalt(10, (err, salt) => {
-      // Set user password to hash
-      bcrypt.hash(user.password, salt, (err, hash) => {
-        user.password = hash;
-        // use next() to continue
-        next();
-      });
-    });
-  } else {
-    next();
-  }
-});
-
-module.exports = mongoose.model("User", UserSchema)
+module.exports = User;
