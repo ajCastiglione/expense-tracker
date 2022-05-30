@@ -7,6 +7,7 @@ const morgan = require("morgan");
 dotenv.config({ path: "./config/config.env" });
 
 const transactions = require("./routes/transactions");
+const users = require("./routes/users");
 
 const app = express();
 
@@ -16,6 +17,7 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
 
+app.use("/api/v1/users", users);
 app.use("/api/v1/transactions", transactions);
 
 // Must be below API routes
