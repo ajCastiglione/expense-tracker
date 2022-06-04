@@ -1,4 +1,6 @@
 import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import "./App.css";
 
 // Local components
@@ -13,13 +15,15 @@ import { GlobalProvider } from "./context/GlobalState";
 function App() {
   return (
     <GlobalProvider>
-      <Header />
-      <div className="container">
-        <Balance />
-        <IncomeExpenses />
-        <TransactionList />
-        <AddTransaction />
-      </div>
+      <Router>
+        <Header />
+        <div className="container">
+          <Balance />
+          <IncomeExpenses />
+          <TransactionList />
+          <AddTransaction />
+        </div>
+      </Router>
     </GlobalProvider>
   );
 }

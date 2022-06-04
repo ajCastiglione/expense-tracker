@@ -53,7 +53,6 @@ User.prototype.generateAuthToken = async (id) => {
   const token = await jwt.sign({ id }, process.env.JWT_KEY, {
     expiresIn: "7d",
   });
-  console.log(token);
   return token;
 };
 
